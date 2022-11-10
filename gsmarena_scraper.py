@@ -1,6 +1,8 @@
 import requests
 from requests_ip_rotator import ApiGateway
 from parsel import Selector
+import asyncio
+from requests_html import AsyncHTMLSession
 
 
 def get_brands():
@@ -22,5 +24,26 @@ def get_brands():
         }
 
 
-for i in get_brands():
-    print(i)
+# for i in get_brands():
+#     print(i)
+
+
+async def send_requests(session, brand_dict):
+
+    brand_name = brand_dict.get("brand_name")
+    brand_url = brand_dict.get("brand_url")
+    if not brand_url.startswith("https://"):
+        brand_url = "http://www.gsmarena.com/" + brand_url.strip("/")
+    resp = await session.get(brand_url)
+    print(brand_name, resp.status_code, sep="--->")
+
+
+async def test_gsmarena_async():
+    session = AsyncHTMLSession()
+
+    task = [send_requests(session, brand_dict) for brand_dict in get_brands()]
+
+    return await asyncio.gather(*task)
+
+
+asyncio.run(test_gsmarena_async())
