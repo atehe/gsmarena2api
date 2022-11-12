@@ -2,7 +2,7 @@ import requests, os, csv
 from requests_ip_rotator import ApiGateway
 from parsel import Selector
 from urllib.parse import urljoin
-from multiprocessing import Pool
+from model import db_session, Brand, Device, DeviceSpecification
 
 
 def dict_to_csv(data, file):
@@ -24,7 +24,7 @@ class GSMArenaScraper:
 
     def open_aws_gateway(self, verbose=False):
         print(
-            f"================= Starting AWS Gateway for: {self.domain} ================="
+            f"================= Opening AWS Gateway for: {self.domain} ================="
         )
         self.gateway = ApiGateway(self.domain, verbose=verbose)
         self.gateway.start()
@@ -39,70 +39,103 @@ class GSMArenaScraper:
     def parse_gsmarena(self):
         response = self.session.get("https://www.gsmarena.com/makers.php3")
 
-        page = Selector(text=response.text)
+        page_selector = Selector(text=response.text)
 
-        brands = page.xpath("//td")
+        brands = page_selector.xpath("//td")
 
         for brand in brands:
+
             brand_name = brand.xpath(".//a/text()").get()
-            brand_url = brand.xpath(".//a/@href").get()
-            num_devices = brand.xpath(".//span/text()").get()
+            brand_id = brand.xpath(".//a/@href").get()
+            num_devices = (
+                brand.xpath(".//span/text()").get().replace("devices", "").strip()
+            )
+            brand_url = urljoin(self.domain, brand_id)
+
+            scraped_brand = db_session.query(Brand).filter_by(name=brand_name).first()
+
+            if scraped_brand:
+                db_num_devices = scraped_brand.num_devices
+
+                # checks if new devices in brand
+                if int(num_devices) > int(db_num_devices):
+                    print(f"Found new Device in Brand: {brand_name}")
+                    scraped_brand.num_devices = num_devices
+                    scraped_brand.update()
+                else:
+                    print(f"No new Device in Brand: {brand_name}")
+                    continue
+            else:
+                new_brand = Brand(
+                    id=brand_id, url=brand_url, name=brand_name, num_devices=num_devices
+                )
+                new_brand.insert()
 
             yield {
                 "brand_name": brand_name,
                 "brand_url": brand_url,
-                "num_devices": num_devices,
+                "brand_id": brand_id,
             }
 
     def parse_brands(self):
 
-        for i, brand in enumerate(self.parse_gsmarena()):
+        for brand in self.parse_gsmarena():
 
-            if i == 10:
-                break
             brand_name = brand.get("brand_name")
-            num_devices = brand.get("num_devices")
             brand_url = brand.get("brand_url")
-
-            brand_url = urljoin(self.domain, brand_url)
-
-            print(brand_name, num_devices, brand_url)
+            brand_id = brand.get("brand_id")
 
             response = self.session.get(brand_url)
-            print(response.status_code, brand_url)
 
-            response = Selector(text=response.text)
+            print(f"[{response.status_code}] Parsing Brand: {brand_name}")
 
-            devices = response.xpath('//div[@class="makers"]//li')
+            page_selector = Selector(text=response.text)
+            devices = page_selector.xpath('//div[@class="makers"]//li')
 
             for device in devices:
+                device_id = device.xpath(".//a/@href").get()
                 device_name = device.xpath(".//a//text()").get()
-                device_url = device.xpath(".//a/@href").get()
+                device_url = urljoin(self.domain, device_id)
 
                 device_thumbnail = device.xpath("//img/@src").get()
                 device_description = device.xpath("//img/@title").get()
 
+                scraped_device = db_session.query(Brand).filter_by(id=device_id).first()
+
+                if scraped_device:
+                    print(f"Device Already in Database: {device_name}")
+                    continue
+                else:
+                    new_device = Device(
+                        id=device_id,
+                        brand_id=brand_id,
+                        url=device_url,
+                        name=device_name,
+                        summary=device_description,
+                        thumbnail=device_thumbnail,
+                    )
+                    new_device.insert()
+
                 yield {
                     "device_name": device_name,
                     "device_url": device_url,
-                    "device_thumbnail": device_thumbnail,
-                    "device_description": device_description,
-                    "brand": brand,
-                    "num_devices": num_devices,
+                    "device_id": device_id,
                 }
 
     def parse_devices(self):
         for device in self.parse_brands():
             device_name = device.get("device_name")
             device_url = device.get("device_url")
-
-            device_url = urljoin(self.domain, device_url)
+            device_id = device.get("device_id")
 
             response = self.session.get(device_url)
-            print(response.status_code, device_name, device_url)
 
-            response = Selector(response.text)
-            tables = response.xpath('//table[@cellspacing="0"]')
+            print(f"[{response.status_code}] Parsing Device: {device_name}")
+
+            page_selector = Selector(response.text)
+            tables = page_selector.xpath('//table[@cellspacing="0"]')
+
+            specs = []
 
             for table in tables:
                 specification_group = table.xpath(".//th/text()").get()
@@ -116,39 +149,19 @@ class GSMArenaScraper:
                         './/td[@class="ttl"]/following-sibling::td//text()'
                     ).get()
 
-                    spec_dict = {
-                        "specification_group": specification_group,
-                        "specification": specification,
-                        "specification_value": specification_value,
-                    }
+                    device_spec = DeviceSpecification(
+                        device_id=device_id,
+                        spec_category=specification_group,
+                        specification=specification,
+                        spec_value=specification_value,
+                    )
+                    specs.append(device_spec)
 
-                    full_phone_dict = device | spec_dict
-
-                    dict_to_csv(full_phone_dict, "testing.csv")
+            db_session.add_all(specs)
+            db_session.commit()
 
 
 scraper = GSMArenaScraper()
-
 scraper.open_aws_gateway()
 scraper.parse_devices()
 scraper.close_aws_gateway()
-
-# scraper.test_class()
-
-
-import datetime
-
-
-# def f(arg):
-#     print(arg**2)
-
-
-# with Pool(20) as p:
-#     start = datetime.datetime.now()
-
-#     p.map(f, list(range(100000 * 100)))
-
-#     print(start, datetime.datetime.now())
-
-
-# # 2022-11-11 12:51:23.713634 2022-11-11 12:53:11.087937
