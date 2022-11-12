@@ -97,8 +97,8 @@ class GSMArenaScraper:
                 device_name = device.xpath(".//a//text()").get()
                 device_url = urljoin(self.domain, device_id)
 
-                device_thumbnail = device.xpath("//img/@src").get()
-                device_description = device.xpath("//img/@title").get()
+                device_thumbnail = device.xpath(".//img/@src").get()
+                device_description = device.xpath(".//img/@title").get()
 
                 scraped_device = db_session.query(Brand).filter_by(id=device_id).first()
 
