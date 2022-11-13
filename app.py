@@ -13,7 +13,7 @@ async def update_db():
     scraper.parse_devices()
     scraper.close_aws_gateway()
 
-    return 200
+    return {"success": True}
 
 
 @app.get("/brands")

@@ -159,9 +159,3 @@ class GSMArenaScraper:
 
             db_session.add_all(specs)
             db_session.commit()
-
-
-scraper = GSMArenaScraper()
-scraper.open_aws_gateway()
-scraper.parse_devices()
-scraper.close_aws_gateway()
