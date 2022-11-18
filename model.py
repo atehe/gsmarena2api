@@ -1,14 +1,8 @@
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import ForeignKey
-from sqlalchemy import Table, Column, Integer, String, ForeignKey
-from sqlalchemy.orm import relationship
-
-from sqlalchemy.orm import Session
-from sqlalchemy import create_engine
-
+from sqlalchemy import Column, Integer, String, ForeignKey, create_engine
+from sqlalchemy.orm import relationship, Session
 
 Base = declarative_base()
-
 
 DATABASE_URI = "sqlite+pysqlite:///gsmarena.db"
 

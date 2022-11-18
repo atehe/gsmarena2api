@@ -10,4 +10,13 @@ GSMArena provides a comparison service that enables its users to compare mobile 
 
 **Source**: [Crunchbase](https://www.crunchbase.com/organization/gsmarena)
 
+## Endpoints
+
+- Get Brands
+- Get Device list by Brand
+- Get Specifications for Device
+
+
+
+
 
