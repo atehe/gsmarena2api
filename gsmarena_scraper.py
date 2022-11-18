@@ -53,12 +53,11 @@ class GSMArenaScraper:
             brand_url = urljoin(self.domain, brand_id)
 
             scraped_brand = db_session.query(Brand).filter_by(name=brand_name).first()
+            db_num_devices = len(scraped_brand.devices)
 
             if scraped_brand:
-                db_num_devices = scraped_brand.num_devices
-
                 # checks if new devices in brand
-                if int(num_devices) > int(db_num_devices):
+                if int(num_devices) > db_num_devices:
                     print(f"Found new Device in Brand: {brand_name}")
                     scraped_brand.num_devices = num_devices
                     scraped_brand.update()
@@ -85,42 +84,55 @@ class GSMArenaScraper:
             brand_url = brand.get("brand_url")
             brand_id = brand.get("brand_id")
 
-            response = self.session.get(brand_url)
+            next_page = brand_url
+            page = 1
 
-            print(f"[{response.status_code}] Parsing Brand: {brand_name}")
+            while next_page:
+                response = self.session.get(next_page)
 
-            page_selector = Selector(text=response.text)
-            devices = page_selector.xpath('//div[@class="makers"]//li')
+                print(
+                    f"[{response.status_code}] Parsing Brand: {brand_name}, page: {page}"
+                )
 
-            for device in devices:
-                device_id = device.xpath(".//a/@href").get()
-                device_name = device.xpath(".//a//text()").get()
-                device_url = urljoin(self.domain, device_id)
+                page_selector = Selector(text=response.text)
 
-                device_thumbnail = device.xpath(".//img/@src").get()
-                device_description = device.xpath(".//img/@title").get()
+                devices = page_selector.xpath('//div[@class="makers"]//li')
 
-                scraped_device = db_session.query(Brand).filter_by(id=device_id).first()
+                for device in devices:
+                    device_id = device.xpath(".//a/@href").get()
+                    device_name = device.xpath(".//a//text()").get()
+                    device_url = urljoin(self.domain, device_id)
 
-                if scraped_device:
-                    print(f"Device Already in Database: {device_name}")
-                    continue
-                else:
-                    new_device = Device(
-                        id=device_id,
-                        brand_id=brand_id,
-                        url=device_url,
-                        name=device_name,
-                        summary=device_description,
-                        thumbnail=device_thumbnail,
+                    device_thumbnail = device.xpath(".//img/@src").get()
+                    device_description = device.xpath(".//img/@title").get()
+
+                    scraped_device = (
+                        db_session.query(Device).filter_by(id=device_id).first()
                     )
-                    new_device.insert()
 
-                yield {
-                    "device_name": device_name,
-                    "device_url": device_url,
-                    "device_id": device_id,
-                }
+                    if scraped_device:
+                        print(f"Device Already in Database: {device_name}")
+                        continue
+                    else:
+                        new_device = Device(
+                            id=device_id,
+                            brand_id=brand_id,
+                            url=device_url,
+                            name=device_name,
+                            summary=device_description,
+                            thumbnail=device_thumbnail,
+                        )
+                        new_device.insert()
+
+                    yield {
+                        "device_name": device_name,
+                        "device_url": device_url,
+                        "device_id": device_id,
+                    }
+                next_page = page_selector.xpath('//a[@class="pages-next"]/@href').get()
+                if next_page and not next_page.startswith("http"):
+                    next_page = urljoin(self.domain, next_page)
+                page += 1
 
     def parse_devices(self):
         for device in self.parse_brands():
@@ -159,3 +171,9 @@ class GSMArenaScraper:
 
             db_session.add_all(specs)
             db_session.commit()
+
+
+scraper = GSMArenaScraper()
+scraper.open_aws_gateway()
+scraper.parse_devices()
+scraper.close_aws_gateway()
