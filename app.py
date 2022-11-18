@@ -17,23 +17,37 @@ async def update_db():
 
 
 @app.get("/brands")
-async def get_brands():
+async def get_brands(page: int = 1, limit: int = 10):
     brands = db_session.query(Brand).all()
 
     formatted_brands = [brand.format() for brand in brands]
 
-    return formatted_brands
+    start = (page - 1) * 10
+    end = start + limit
+
+    return {
+        "success": True,
+        "brands": formatted_brands[start:end],
+        "total_brands": len(formatted_brands),
+    }
 
 
 @app.get("/brands/{brand_id}")
-async def get_devices(brand_id):
+async def get_devices(brand_id, page: int = 1, limit: int = 10):
     devices = db_session.query(Device).filter_by(brand_id=brand_id)
+
+    brand = db_session.query(Brand).filter_by(id=brand_id).first()
 
     formatted_devices = [device.format() for device in devices]
 
-    # TODO: get brand details and add to endpoint output
+    start = (page - 1) * 10
+    end = start + limit
 
-    return formatted_devices
+    return {
+        "success": True,
+        "brand": brand.format(),
+        "devices": formatted_devices[start:end],
+    }
 
 
 @app.get("/devices/{device_id}")
@@ -41,21 +55,26 @@ async def get_device_specifications(device_id):
     specs = db_session.query(DeviceSpecification).filter_by(device_id=device_id)
 
     formatted_specs = [spec.format() for spec in specs]
+    device = db_session.query(Device).filter_by(id=device_id).first()
+    brand = device.brand.format()
 
-    # TODO: get device, brand details and add to endpoint output
-
-    return formatted_specs
+    return {"success": True, "brand": brand, "device": device, "specs": formatted_specs}
 
 
 @app.get("/devices")
-async def devices():
+async def all_devices(page: int = 1, limit: int = 10):
     devices = db_session.query(Device).all()
 
-    formatted_devices = [devices.format() for device in devices]
+    formatted_devices = [device.format() for device in devices]
 
-    # TODO: get brand details and add to endpoint output
+    start = (page - 1) * 10
+    end = start + limit
 
-    return formatted_devices
+    return {
+        "success": True,
+        "devices": formatted_devices[start:end],
+        "total_devices": len(formatted_devices),
+    }
 
 
 @app.get("/latest_devices")
