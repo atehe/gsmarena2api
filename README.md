@@ -1,5 +1,5 @@
 # GSMArena2API
-A FastAPI implementation of [GSMArena](https://www.gsmarena.com/), reperesenting its data in json
+A minimalistic FastAPI implementation of [GSMArena](https://www.gsmarena.com/), reperesenting its data in json
 
 #### About GSMArena
 GSMArena is an online website that offers comprehensive and up-to-date mobile phone information.
