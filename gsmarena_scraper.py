@@ -173,7 +173,8 @@ class GSMArenaScraper:
             db_session.commit()
 
 
-scraper = GSMArenaScraper()
-scraper.open_aws_gateway()
-scraper.parse_devices()
-scraper.close_aws_gateway()
+if __name__ == "__main__":
+    scraper = GSMArenaScraper()
+    scraper.open_aws_gateway()
+    scraper.parse_devices()
+    scraper.close_aws_gateway()

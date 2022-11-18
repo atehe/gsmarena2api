@@ -54,11 +54,24 @@ async def get_devices(brand_id, page: int = 1, limit: int = 10):
 async def get_device_specifications(device_id):
     specs = db_session.query(DeviceSpecification).filter_by(device_id=device_id)
 
-    formatted_specs = [spec.format() for spec in specs]
     device = db_session.query(Device).filter_by(id=device_id).first()
     brand = device.brand.format()
 
-    return {"success": True, "brand": brand, "device": device, "specs": formatted_specs}
+    grouped_specs = {}
+    for spec in specs:
+        spec_category = spec.spec_category
+        specification = spec.specification
+        spec_value = spec.spec_value
+        grouped_specs.setdefault(spec_category, {})
+
+        grouped_specs[spec_category][specification] = spec_value
+
+    return {
+        "success": True,
+        "brand": brand,
+        "device": device,
+        "specifications": grouped_specs,
+    }
 
 
 @app.get("/devices")
