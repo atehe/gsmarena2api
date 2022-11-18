@@ -177,7 +177,10 @@ GSMArena provides a comparison service that enables its users to compare mobile 
       "summary": "Acer Liquid Z6 Android smartphone. Announced Aug 2016. Features 5.0″  display, MT6737 chipset, 8 MP primary camera, 2 MP front camera, 2000 mAh battery, 8 GB storage, 1000 MB RAM."
     }...]
 ```
+**Optional Parameters**
 
+- `page`: Page of API response
+- `limit`: Number of result returned per page, default is 10
 
 
 
