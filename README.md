@@ -34,7 +34,9 @@ GSMArena provides a comparison service that enables its users to compare mobile 
       "url": "https://www.gsmarena.com/alcatel-phones-5.php",
       "num_devices": 407
     },
-    ...]
+    ...,
+  ]
+}
 ```
 - **Get Devices for Brand**
 
@@ -65,7 +67,8 @@ GSMArena provides a comparison service that enables its users to compare mobile 
       "thumbnail": "https://fdn2.gsmarena.com/vv/bigpic/apple-ipad-pro-11-2022.jpg",
       "summary": "Apple iPad Pro 11 (2022) tablet. Announced Oct 2022. Features 11.0″  display, Apple M2 chipset, 7538 mAh battery, 2048 GB storage, 16 GB RAM, Scratch-resistant glass."
     },
-    ...]
+    ...,
+  ]
 }
 ```
 
@@ -115,7 +118,9 @@ GSMArena provides a comparison service that enables its users to compare mobile 
       "Size": "11.0 inches, 366.5 cm",
       "Resolution": "1668 x 2388 pixels (~265 ppi density)",
       "Protection": "Scratch-resistant glass, oleophobic coating"
-    }...}
+    }
+  }
+}
 
 ```
 
@@ -153,7 +158,8 @@ GSMArena provides a comparison service that enables its users to compare mobile 
       "thumbnail": "https://fdn2.gsmarena.com/vv/bigpic/acer-liquid-z6-plus.jpg",
       "summary": "Acer Liquid Z6 Plus Android smartphone. Announced Aug 2016. Features 5.5″  display, MT6753 chipset, 13 MP primary camera, 5 MP front camera, 4080 mAh battery, 32 GB storage, 3 GB RAM."
     },
-    ...]
+    ...,
+  ]
 }
 ```
 **Optional Parameters**
