@@ -10,19 +10,21 @@ class PaginatedResponse(Response):
     size: int
 
 
-class Brand(pydantic.BaseModel):
+class BrandNoNum(pydantic.BaseModel):
     id: str
     name: str
     url: str
-    num_devices: int
 
     class Config:
         orm_mode = True
 
 
-class Device(pydantic.BaseModel):
+class Brand(BrandNoNum):
+    num_devices: int
+
+
+class DeviceNoBrandID(pydantic.BaseModel):
     id: str
-    brand_id: str
     name: str
     url: str
     thumbnail: str
@@ -30,6 +32,10 @@ class Device(pydantic.BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class Device(DeviceNoBrandID):
+    brand_id: str
 
 
 class DeviceWithSpec(Device):
@@ -50,10 +56,11 @@ class DevicesResponse(PaginatedResponse):
 
 
 class BrandDevicesResponse(DevicesResponse):
-    brand: Brand
+    brand: BrandNoNum
+    devices: list[DeviceNoBrandID]
 
 
 class DeviceSpecDetail(Response):
-    brand: Brand
-    device: Device
+    brand: BrandNoNum
+    device: DeviceNoBrandID
     specifications: dict

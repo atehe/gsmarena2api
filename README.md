@@ -15,9 +15,12 @@ GSMArena provides a comparison service that enables its users to compare mobile 
 - **Get Brands**
 
 `/brands`: Returns all brands
-```
+```json
 {
   "success": true,
+  "total_brands": 123,
+  "page": 1,
+  "size": 10,
   "brands": [
     {
       "id": "acer-phones-59.php",
@@ -31,30 +34,25 @@ GSMArena provides a comparison service that enables its users to compare mobile 
       "url": "https://www.gsmarena.com/alcatel-phones-5.php",
       "num_devices": 407
     },
-    {
-      "id": "allview-phones-88.php",
-      "name": "Allview",
-      "url": "https://www.gsmarena.com/allview-phones-88.php",
-      "num_devices": 157
-    }
     ...]
 ```
 - **Get Devices for Brand**
 
 `brands/<brand_id>`: Returns all devices in a brand
-```
-
+```json
+{
   "success": true,
+  "total_devices": 111,
+  "page": 1,
+  "size": 10,
   "brand": {
     "id": "apple-phones-48.php",
     "name": "Apple",
     "url": "https://www.gsmarena.com/apple-phones-48.php",
-    "num_devices": 111
   },
   "devices": [
     {
       "id": "apple_ipad_pro_12_9_(2022)-11939.php",
-      "brand_id": "apple-phones-48.php",
       "name": "iPad Pro 12.9 (2022)",
       "url": "https://www.gsmarena.com/apple_ipad_pro_12_9_(2022)-11939.php",
       "thumbnail": "https://fdn2.gsmarena.com/vv/bigpic/apple-ipad-pro-129-2022.jpg",
@@ -62,50 +60,34 @@ GSMArena provides a comparison service that enables its users to compare mobile 
     },
     {
       "id": "apple_ipad_pro_11_(2022)-11940.php",
-      "brand_id": "apple-phones-48.php",
       "name": "iPad Pro 11 (2022)",
       "url": "https://www.gsmarena.com/apple_ipad_pro_11_(2022)-11940.php",
       "thumbnail": "https://fdn2.gsmarena.com/vv/bigpic/apple-ipad-pro-11-2022.jpg",
       "summary": "Apple iPad Pro 11 (2022) tablet. Announced Oct 2022. Features 11.0″  display, Apple M2 chipset, 7538 mAh battery, 2048 GB storage, 16 GB RAM, Scratch-resistant glass."
     },
-    {
-      "id": "apple_ipad_(2022)-11941.php",
-      "brand_id": "apple-phones-48.php",
-      "name": "iPad (2022)",
-      "url": "https://www.gsmarena.com/apple_ipad_(2022)-11941.php",
-      "thumbnail": "https://fdn2.gsmarena.com/vv/bigpic/apple-ipad-10-2022.jpg",
-      "summary": "Apple iPad (2022) tablet. Announced Oct 2022. Features 10.9″  display, Apple A14 Bionic chipset, 256 GB storage, Scratch-resistant glass."
-    }
     ...]
-    
+}
 ```
 
 - **Get Specifications of Device**
 
 `/devices/<device_id>`: Returns specifications for a device
 
-```
+```json
 {
   "success": true,
+  "total_devices": 112,
   "brand": {
     "id": "apple-phones-48.php",
     "name": "Apple",
     "url": "https://www.gsmarena.com/apple-phones-48.php",
-    "num_devices": 111
   },
   "device": {
     "id": "apple_ipad_pro_11_(2022)-11940.php",
     "url": "https://www.gsmarena.com/apple_ipad_pro_11_(2022)-11940.php",
     "summary": "Apple iPad Pro 11 (2022) tablet. Announced Oct 2022. Features 11.0″  display, Apple M2 chipset, 7538 mAh battery, 2048 GB storage, 16 GB RAM, Scratch-resistant glass.",
     "name": "iPad Pro 11 (2022)",
-    "brand_id": "apple-phones-48.php",
     "thumbnail": "https://fdn2.gsmarena.com/vv/bigpic/apple-ipad-pro-11-2022.jpg",
-    "brand": {
-      "num_devices": 111,
-      "url": "https://www.gsmarena.com/apple-phones-48.php",
-      "id": "apple-phones-48.php",
-      "name": "Apple"
-    }
   },
   "specifications": {
     "Network": {
@@ -140,9 +122,12 @@ GSMArena provides a comparison service that enables its users to compare mobile 
 - **Get all devices**
 
 `/devices`: Returns all devices
-```
+```json
 {
   "success": true,
+  "total_devices": 11500,
+  "page": 1,
+  "size": 10,
   "devices": [
     {
       "id": "acer_chromebook_tab_10-9139.php",
@@ -168,14 +153,8 @@ GSMArena provides a comparison service that enables its users to compare mobile 
       "thumbnail": "https://fdn2.gsmarena.com/vv/bigpic/acer-liquid-z6-plus.jpg",
       "summary": "Acer Liquid Z6 Plus Android smartphone. Announced Aug 2016. Features 5.5″  display, MT6753 chipset, 13 MP primary camera, 5 MP front camera, 4080 mAh battery, 32 GB storage, 3 GB RAM."
     },
-    {
-      "id": "acer_liquid_z6-8304.php",
-      "brand_id": "acer-phones-59.php",
-      "name": "Liquid Z6",
-      "url": "https://www.gsmarena.com/acer_liquid_z6-8304.php",
-      "thumbnail": "https://fdn2.gsmarena.com/vv/bigpic/acer-liquid-z6.jpg",
-      "summary": "Acer Liquid Z6 Android smartphone. Announced Aug 2016. Features 5.0″  display, MT6737 chipset, 8 MP primary camera, 2 MP front camera, 2000 mAh battery, 8 GB storage, 1000 MB RAM."
-    }...]
+    ...]
+}
 ```
 **Optional Parameters**
 

@@ -56,7 +56,7 @@ async def get_device_specificaitions(device_id: str):
     if device is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Brand not found"
+            detail="Device not found"
         )
 
     grouped_specs = dict()
