@@ -36,14 +36,6 @@ class Brand(Base, BaseModel):
     num_devices = Column(Integer())
     devices = relationship("Device", back_populates="brand")
 
-    def format(self):
-        return {
-            "id": self.id,
-            "name": self.name,
-            "url": self.url,
-            "num_devices": self.num_devices,
-        }
-
 
 class Device(Base, BaseModel):
     __tablename__ = "device"
@@ -56,16 +48,6 @@ class Device(Base, BaseModel):
 
     brand = relationship("Brand", back_populates="devices")
     specs = relationship("DeviceSpecification", back_populates="device")
-
-    def format(self):
-        return {
-            "id": self.id,
-            "brand_id": self.brand_id,
-            "name": self.name,
-            "url": self.url,
-            "thumbnail": self.thumbnail,
-            "summary": self.summary,
-        }
 
 
 class DeviceSpecification(Base, BaseModel):
@@ -86,12 +68,5 @@ class DeviceSpecification(Base, BaseModel):
             .update(kwargs)
         db_session.commit()
 
-    def format(self):
-        return {
-            "device_id": self.device_id,
-            "spec_category": self.spec_category,
-            "specification": self.specification,
-            "spec_value": self.spec_value,
-        }
 
 Base.metadata.create_all(engine)
