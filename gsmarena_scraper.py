@@ -2,7 +2,8 @@ import requests, os, csv
 from requests_ip_rotator import ApiGateway
 from parsel import Selector
 from urllib.parse import urljoin
-from model import db_session, Brand, Device, DeviceSpecification
+
+from app.models import db_session, Brand, Device, DeviceSpecification
 
 
 def dict_to_csv(data, file):
@@ -59,8 +60,7 @@ class GSMArenaScraper:
                 # checks if new devices in brand
                 if int(num_devices) > db_num_devices:
                     print(f"Found new Device in Brand: {brand_name}")
-                    scraped_brand.num_devices = num_devices
-                    scraped_brand.update()
+                    scraped_brand.update(num_devices=num_devices)
                 else:
                     print(f"No new Device in Brand: {brand_name}")
                     continue
